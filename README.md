@@ -5,7 +5,7 @@ A Python tool that screens MAFFT parameters, performs and evaluates alignments, 
 Created by Nicolas-Frédéric Lipp, PhD. 
 
 ## Features
-MAFFT_ScoreNGo is useful for determining the theoretically best alignment method using MAFFT** for your specific protein sequence dataset. All you need is an input .fasta file of unaligned sequences. It is recommended to run it on a small dataset - you can use the script I provided, "Rand_NSamp_MyFasta.py" **(available soon)**, to extract 200 sequences or less if your dataset is too large. 
+MAFFT_ScoreNGo is useful for determining the theoretically best alignment method using MAFFT** for your specific protein sequence dataset. All you need is an input .fasta file of unaligned sequences. It is recommended to run it on a small dataset - you can use the script I provided, "Rand_NSamp_MyFasta.py" _(available soon)_, to extract 200 sequences or less if your dataset is too large. 
 
 - Automated screening of multiple MAFFT parameters
 - Evaluation of alignment quality using custom scoring metrics
