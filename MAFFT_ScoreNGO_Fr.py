@@ -1,5 +1,5 @@
-#This is a preliminary version of the code
-#The script is currently in French, I'll translate it later.
+#The script is still in its beta version
+#The script is the French version of MAFFT_ScoreNGo
 import os
 import subprocess
 import time
