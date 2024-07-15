@@ -25,7 +25,7 @@ MAFFT_ScoreNGo tests various combinations of the following MAFFT parameters:
 - Gap extension penalties
 - Large gap penalties
 
-For more details about tested parameters and scoring algorithms, please see PARAMETERS.md
+For more details about tested parameters and scoring algorithms, please see [PARAMETERS.md](./PARAMETERS.md)
 
 
 ## Installation
