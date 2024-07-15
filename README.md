@@ -12,9 +12,20 @@ MAFFT_ScoreNGo is useful for determining the theoretically best alignment method
 - Identification of optimal alignment strategy for given dataset
 - Generation of comprehensive result summaries
 
-For more details about tested parameters and scoring algorithms, please see PARAMETERS.md
+
 
 *MAFFT stands for Multiple sequence Alignment using Fast Fourier Transform. More documentation can be found at [mafft.cbrc.jp](https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html), [Katoh et al. (Nucleic Acids Res., 2002)](https://doi.org/10.1093%2Fnar%2Fgkf436), and [Katoh et al. (Brief. Bioinform., 2017)](https://doi.org/10.1093/bib/bbx108).*
+
+## Parameters Overview
+
+MAFFT_ScoreNGo tests various combinations of the following MAFFT parameters:
+- Alignment strategies (--genafpair, --localpair, --globalpair)
+- Substitution matrices (BLOSUM62, BLOSUM80)
+- Gap opening penalties
+- Gap extension penalties
+- Large gap penalties
+
+For more details about tested parameters and scoring algorithms, please see PARAMETERS.md
 
 
 ## Installation
