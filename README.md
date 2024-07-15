@@ -8,6 +8,7 @@ Created by Nicolas-Frédéric Lipp, PhD.
 MAFFT_ScoreNGo is useful for determining the theoretically best alignment method using MAFFT** for your specific protein sequence dataset. All you need is an input .fasta file of unaligned sequences. It is recommended to run it on a small dataset - you can use the script I provided, "Rand_NSamp_MyFasta.py" _(available soon)_, to extract 200 sequences or less if your dataset is too large. 
 
 - Automated screening of multiple MAFFT parameters
+- Three screening levels: Light, Standard, and Aggressive
 - Evaluation of alignment quality using custom scoring metrics
 - Identification of optimal alignment strategy for given dataset
 - Generation of comprehensive result summaries
@@ -25,7 +26,7 @@ MAFFT_ScoreNGo tests various combinations of the following MAFFT parameters:
 - Gap extension penalties
 - Large gap penalties
 
-For more details about tested parameters and scoring algorithms, please see [PARAMETERS.md](./PARAMETERS.md)
+For a detailed explanation of the parameters tested and scoring algorithms used, please refer to the [PARAMETERS.md](./PARAMETERS.md) file.
 
 
 ## Installation
@@ -43,14 +44,14 @@ For more details about tested parameters and scoring algorithms, please see [PAR
 
 ### Quick Start
 1. Run the script with:  
-```python3 MAFFT_ScoreNGo.py```
+   ```python3 MAFFT_ScoreNGo.py```
 
 2. Follow the prompts to select your input FASTA file.
-Select the screening level : Light, Standard or Aggressive (type ```1```, ```2``` or ```3```)
+
 3. Choose the screening level:
-- Light (type `1`): Quick screening with fewer parameter combinations.
-- Standard (type `2`): Balanced screening with a moderate number of combinations.
-- Aggressive (type `3`): Thorough screening with many parameter combinations.
+   - Light (type `1`): Quick screening with fewer parameter combinations.
+   - Standard (type `2`): Balanced screening with a moderate number of combinations.
+   - Aggressive (type `3`): Thorough screening with many parameter combinations.
 
 4. (Optional) Enter your own personalized parameters if desired.
 
@@ -68,7 +69,11 @@ The script will output:
 2. Detailed information for each alignment, including parameters used, execution time, and various scores.
 3. The best combination of parameters for your dataset.
 
-Results are saved in the `mafft_results` directory.
+Results are saved in the `mafft_results` directory, including:
+- Individual alignment files
+- A summary file (mafft_results_summary.txt)
+- A list of MAFFT commands used (mafft_commands.txt)
+- Debug logs (debug_logs.txt)
 
 ## Troubleshooting
 
@@ -121,7 +126,7 @@ After installation, verify MAFFT is accessible by running:
 ```mafft --version```
 
 ## Performance
-`MAFFT_ScoreNGo.py` was tested with [dataset_seq_example.fasta](./dataset_seq_example.fasta), containing 69 sequences with an average length of 438 amino acids, using macOS Sonoma on an ARM M1 Max (10-core CPU, 32-core GPU) with 32 GB of RAM. With this configuration, it took 25 seconds to run 13 alignments (Light Screening Level) and perform the scoring assessment.
+`MAFFT_ScoreNGo.py` was tested with [dataset_seq_example.fasta](./dataset_seq_example.fasta), containing 69 sequences with an average length of 438 amino acids, using macOS Sonoma on an ARM M1 Max (10-core CPU, 32-core GPU) with 32 GB of RAM. With this configuration, it took 25 seconds to run the Light screening level (13 alignments) and perform the scoring assessment.
 Don't forget to "[caffeinate](https://www.theapplegeek.co.uk/blog/caffeinate)" your Mac! (or use [systemd-inhibit](https://evanhahn.com/systemd-inhibit-alternative-to-macos-caffeinate/) on your Linux machine).
 
 ## License
