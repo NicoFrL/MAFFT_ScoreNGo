@@ -41,17 +41,40 @@ For more details about tested parameters and scoring algorithms, please see [PAR
 
 ## Usage
 
-Run the script with:  
+### Quick Start
+1. Run the script with:  
 ```python3 MAFFT_ScoreNGo.py```
 
-Follow the prompts to select your input FASTA file.
+2. Follow the prompts to select your input FASTA file.
+Select the screening level : Light, Standard or Aggressive (type ```1```, ```2``` or ```3```)
+3. Choose the screening level:
+- Light (type `1`): Quick screening with fewer parameter combinations.
+- Standard (type `2`): Balanced screening with a moderate number of combinations.
+- Aggressive (type `3`): Thorough screening with many parameter combinations.
 
-## Output
+4. (Optional) Enter your own personalized parameters if desired.
 
-The script will create a directory named 'mafft_results' in the same location as your input file, containing:
-- Individual alignment files
-- A summary of results (mafft_results_summary.txt)
-- A list of MAFFT commands used (mafft_commands.txt)
+5. Confirm that you want to run the computation on the given number of combinations.
+
+### Customization
+
+You can add custom MAFFT parameters to be tested alongside the predefined combinations. When prompted, enter your parameters in the MAFFT command-line format. For example: ```--maxiterate 1000 --globalpair --thread 4```
+
+
+### Interpreting Results
+
+The script will output:
+1. A ranking of the top 13 alignments based on the final score.
+2. Detailed information for each alignment, including parameters used, execution time, and various scores.
+3. The best combination of parameters for your dataset.
+
+Results are saved in the `mafft_results` directory.
+
+## Troubleshooting
+
+- If MAFFT is not found, ensure it's correctly installed and added to your system PATH.
+- For memory issues with large datasets, try using a smaller subset of sequences.
+- If you encounter Python-related errors, verify that all dependencies are correctly installed.
 
 ## Dependencies
 
