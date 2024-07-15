@@ -97,6 +97,12 @@ MAFFT must be installed separately and be available in your system PATH. Install
 After installation, verify MAFFT is accessible by running:  
 ```mafft --version```
 
+## Performances
+MAFFT_ScoreNGo.py was tested on a dataset of 200 sequences with an average length of 183 residues, using MacOS Sonoma on an ARM M1 Max (10-core CPU, 32-core GPU) with 32 GB of RAM. With this configuration, it took around 30 minutes to run all alignments and scoring assessments.
+Don't forget to "[Caffeinate](https://www.theapplegeek.co.uk/blog/caffeinate)" your Mac! (or [systemd-inhibit](https://evanhahn.com/systemd-inhibit-alternative-to-macos-caffeinate/) your Linux machine). 
+
+
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
