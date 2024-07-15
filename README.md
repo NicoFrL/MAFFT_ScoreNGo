@@ -14,7 +14,7 @@ MAFFT_ScoreNGo is useful for determining the theoretically best alignment method
 
 
 
-*MAFFT stands for Multiple sequence Alignment using Fast Fourier Transform. More documentation can be found at [mafft.cbrc.jp](https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html), [Katoh et al. (Nucleic Acids Res., 2002)](https://doi.org/10.1093%2Fnar%2Fgkf436), and [Katoh et al. (Brief. Bioinform., 2017)](https://doi.org/10.1093/bib/bbx108).*
+***MAFFT stands for Multiple sequence Alignment using Fast Fourier Transform. More documentation can be found at [mafft.cbrc.jp](https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html), [Katoh et al. (Nucleic Acids Res., 2002)](https://doi.org/10.1093%2Fnar%2Fgkf436), and [Katoh et al. (Brief. Bioinform., 2017)](https://doi.org/10.1093/bib/bbx108).*
 
 ## Parameters Overview
 
