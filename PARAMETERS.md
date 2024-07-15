@@ -29,7 +29,7 @@ MAFFT_ScoreNGo tests various combinations of the following MAFFT parameters:
 
 5. Large gap penalties:
    - None (using MAFFT default values: --lop -2.00 --lep 0.1)
-   - Custom: ```--lop``` ```-2.00``` ```--lep -0.1```
+   - Custom: ```--lop -2.00``` ```--lep -0.1```
 
 Additional parameters:
 - ```--maxiterate 1000```: Maximum number of iterative refinement cycles (applied to all combinations)
