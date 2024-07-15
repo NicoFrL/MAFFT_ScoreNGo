@@ -1,4 +1,4 @@
-#This is a preliminary version of the code, it will run 108 alignments, large gap options are not coherent yet, and more options will be add later, notably to include EinsI methods.
+#This is a preliminary version of the code
 #The script is currently in French, I'll translate it later.
 import os
 import subprocess
@@ -78,28 +78,122 @@ def evaluate_alignment(alignment_file):
         print(f"Erreur lors de l'évaluation de l'alignement: {e}")
         return None, None, None, None
 
+def get_mafft_combinations(screening_level):
+    strategies = ["--genafpair", "--localpair", "--globalpair"]
+    matrices = ["", "--bl 80"]  # "" pour BLOSUM62 (défaut), "--bl 80" pour BLOSUM80
+
+    if screening_level == "light":
+        gap_opens = ["--op 1.53"]
+        gap_extensions = ["--ep 0", "--ep 0.123"]
+        local_params = [""]
+        large_gaps = [""]
+        weights = [""]
+        retrees = ["--retree 2"]
+    elif screening_level == "standard":
+        gap_opens = ["--op 1.53", "--op 3.0"]
+        gap_extensions = ["--ep 0", "--ep 0.123", "--ep 0.5"]
+        local_params = ["", "--lop -1.0 --lexp -0.5"]
+        large_gaps = ["", "--LOP -8.00"]
+        weights = ["", "--weighti 4.0"]
+        retrees = ["--retree 2", "--retree 3"]
+    elif screening_level == "aggressive":
+        gap_opens = ["--op 1.0", "--op 1.53", "--op 2.0", "--op 3.0"]
+        gap_extensions = ["--ep 0", "--ep 0.123", "--ep 0.5", "--ep 1.0"]
+        local_params = ["", "--lop -1.0 --lep 0.0 --lexp -0.1", "--lop -3.00 --lep 0.2 --lexp -0.2"]
+        large_gaps = ["", "--LOP -6.00 --LEXP 0.00", "--LOP -8.00 --LEXP 0.1"]
+        weights = ["", "--weighti 1.0", "--weighti 4.0"]
+        retrees = ["--retree 2", "--retree 3"]
+
+    combinations = []
+    for strategy in strategies:
+        for matrix in matrices:
+            for gap_open in gap_opens:
+                for gap_ext in gap_extensions:
+                    for weight in weights:
+                        for retree in retrees:
+                            base_params = f"{strategy} {matrix} {gap_open} {gap_ext} {weight} {retree} --maxiterate 1000 --thread -1"
+                            
+                            if strategy in ["--genafpair", "--localpair"]:
+                                for local_param in local_params:
+                                    if strategy == "--genafpair":
+                                        for large_gap in large_gaps:
+                                            params = f"{base_params} {local_param} {large_gap}"
+                                            combinations.append(params)
+                                    else:
+                                        params = f"{base_params} {local_param}"
+                                        combinations.append(params)
+                            else:
+                                combinations.append(base_params)
+    
+    # Ajout explicite de E-INS-i
+    combinations.append("--ep 0 --genafpair --maxiterate 1000 --thread -1")
+    
+    return combinations
+
 def main():
     input_file = select_file()
     if not input_file:
         print("Aucun fichier sélectionné. Le programme se termine.")
         return
 
-    strategies = ["--genafpair", "--localpair", "--globalpair"]
-    matrices = ["", "--bl 80"]  # "" pour BLOSUM62 (défaut), "--bl 80" pour BLOSUM80
-    gap_opens = ["--op 1.53", "--op 2.0", "--op 3.0"]
-    gap_extensions = ["--ep 0.123", "--ep 0.5", "--ep 1.0"]
-    large_gaps = ["", "--lop -2.00 --lep -0.1"]
+    print("Choisissez le niveau de screening :")
+    print("1. Léger")
+    print("2. Standard")
+    print("3. Agressif")
+    
+    choice = input("Entrez votre choix (1, 2 ou 3) : ")
+    
+    if choice == "1":
+        level = "light"
+    elif choice == "2":
+        level = "standard"
+    elif choice == "3":
+        level = "aggressive"
+    else:
+        print("Choix invalide. Utilisation du niveau standard.")
+        level = "standard"
+    
+    combinations = get_mafft_combinations(level)
+    
+    # Demande de paramètre personnalisé
+    print("\nVoulez-vous ajouter une ligne de paramètres spécifique à comparer ?")
+    print("(Entrez vos paramètres et appuyez sur Entrée. Si rien ne se passe, appuyez sur Entrée une seconde fois.)")
+    print("(Laissez vide et appuyez sur Entrée pour ignorer.)")
+    
+    custom_params = []
+    while True:
+        line = input("Paramètres personnalisés : ").strip()
+        if line:
+            custom_params.append(line)
+        else:
+            break
+    
+    custom_params = " ".join(custom_params)
+    if custom_params:
+        combinations.append(custom_params)
+        print(f"Paramètres personnalisés ajoutés : {custom_params}")
+    else:
+        print("Aucun paramètre personnalisé ajouté.")
+    
+    print(f"\nNombre total de combinaisons : {len(combinations)}")
+    
+    while True:
+        confirmation = input("Validez-vous ce nombre de combinaisons ? (Y/N) : ").strip().lower()
+        if confirmation == 'y':
+            break
+        elif confirmation == 'n':
+            print("Opération annulée par l'utilisateur.")
+            return
+        else:
+            print("Réponse invalide. Veuillez répondre par 'Y' pour oui ou 'N' pour non.")
 
     results = {}
     mafft_commands = {}
 
-    combinations = list(itertools.product(strategies, matrices, gap_opens, gap_extensions, large_gaps))
-
     output_dir = os.path.join(os.path.dirname(input_file), "mafft_results")
     os.makedirs(output_dir, exist_ok=True)
 
-    for i, (strategy, matrix, gap_open, gap_ext, large_gap) in enumerate(combinations, 1):
-        params = f"{strategy} {matrix} {gap_open} {gap_ext} {large_gap} --maxiterate 1000 --thread -1"
+    for i, params in enumerate(combinations, 1):
         output_file = os.path.join(output_dir, f"alignment_{i}.fasta")
         
         print(f"\nExécution de la combinaison {i}/{len(combinations)}:")
@@ -128,32 +222,39 @@ def main():
         print("Aucun résultat n'a été obtenu. Vérifiez les erreurs ci-dessus.")
         return
 
-    print("\nRésultats :")
+    # Tri des résultats par score final décroissant
+    sorted_results = sorted(results.items(), key=lambda x: x[1]['final_score'], reverse=True)
+
+    print("\nClassement des 13 meilleurs alignements :")
     print("=" * 50)
-    for i, res in results.items():
-        print(f"\nCombination {i}:")
+    for i, (combo, res) in enumerate(sorted_results[:13], 1):
+        print(f"\nRang {i}:")
+        print(f"Combination {combo}:")
         print(f"Paramètres : {res['params']}")
-        print(f"Temps d'exécution : {res['execution_time']:.2f} secondes")
         print(f"Score final : {res['final_score']:.4f}")
+        print(f"Temps d'exécution : {res['execution_time']:.2f} secondes")
         print(f"Score de conservation : {res['conservation_score']:.4f}")
         print(f"Pénalité de gap : {res['gap_penalty']:.4f}")
         print(f"Score de complexité : {res['complexity_score']:.4f}")
 
-    best_combo = max(results, key=lambda x: results[x]['final_score'])
+    best_combo = sorted_results[0][0]
     print(f"\nLa combinaison avec le meilleur score final est : {best_combo}")
     print(f"Paramètres : {results[best_combo]['params']}")
 
     results_file = os.path.join(output_dir, "mafft_results_summary.txt")
     with open(results_file, 'w') as f:
-        for i, res in results.items():
-            f.write(f"Combination {i}:\n")
+        f.write("Classement des 13 meilleurs alignements :\n")
+        f.write("=" * 50 + "\n")
+        for i, (combo, res) in enumerate(sorted_results[:13], 1):
+            f.write(f"\nRang {i}:\n")
+            f.write(f"Combination {combo}:\n")
             f.write(f"Paramètres : {res['params']}\n")
-            f.write(f"Temps d'exécution : {res['execution_time']:.2f} secondes\n")
             f.write(f"Score final : {res['final_score']:.4f}\n")
+            f.write(f"Temps d'exécution : {res['execution_time']:.2f} secondes\n")
             f.write(f"Score de conservation : {res['conservation_score']:.4f}\n")
             f.write(f"Pénalité de gap : {res['gap_penalty']:.4f}\n")
-            f.write(f"Score de complexité : {res['complexity_score']:.4f}\n\n")
-        f.write(f"Meilleure combinaison : {best_combo}\n")
+            f.write(f"Score de complexité : {res['complexity_score']:.4f}\n")
+        f.write(f"\nMeilleure combinaison : {best_combo}\n")
         f.write(f"Paramètres : {results[best_combo]['params']}\n")
 
     print(f"\nLes résultats détaillés ont été sauvegardés dans : {results_file}")
