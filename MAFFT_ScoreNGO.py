@@ -17,19 +17,18 @@ def select_file():
         title="Sélectionnez le fichier FASTA d'entrée",
         filetypes=[("Fichiers FASTA", "*.fasta *.fa *.fna *.ffn *.faa *.frn")]
     )
-    return file_path
+    return os.path.abspath(file_path)
 
 def run_mafft(input_file, output_file, params):
     start_time = time.time()
-    cmd = f"mafft {params} {input_file} > {output_file}"
+    cmd = f"mafft {params} \"{input_file}\" > \"{output_file}\""
     try:
-        subprocess.run(cmd, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(cmd, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+        end_time = time.time()
+        return end_time - start_time, result.stderr
     except subprocess.CalledProcessError as e:
         print(f"Erreur lors de l'exécution de MAFFT: {e}")
-        print(f"Sortie d'erreur: {e.stderr}")
-        return None
-    end_time = time.time()
-    return end_time - start_time
+        return None, e.stderr
 
 def evaluate_alignment(alignment_file):
     try:
@@ -49,7 +48,7 @@ def evaluate_alignment(alignment_file):
             col_score = 0
             for a in char_counts:
                 for b in char_counts:
-                    if a != '-' and b != '-':
+                    if a != '-' and b != '-' and a.isalpha() and b.isalpha():
                         if (a, b) in blosum:
                             col_score += char_counts[a] * char_counts[b] * blosum[(a, b)]
                         elif (b, a) in blosum:
@@ -189,6 +188,7 @@ def main():
 
     results = {}
     mafft_commands = {}
+    debug_logs = []
 
     output_dir = os.path.join(os.path.dirname(input_file), "mafft_results")
     os.makedirs(output_dir, exist_ok=True)
@@ -199,11 +199,19 @@ def main():
         print(f"\nExécution de la combinaison {i}/{len(combinations)}:")
         print(f"Paramètres : {params}")
         
-        mafft_commands[i] = f"mafft {params} {input_file} > {output_file}"
+        debug_logs.append(f"\nExécution de la combinaison {i}/{len(combinations)}:")
+        debug_logs.append(f"Paramètres : {params}")
         
-        execution_time = run_mafft(input_file, output_file, params)
+        mafft_commands[i] = f"mafft {params} \"{input_file}\" > \"{output_file}\""
+        
+        execution_time, mafft_output = run_mafft(input_file, output_file, params)
         if execution_time is None:
+            debug_logs.append(f"Échec de l'exécution pour la combinaison {i}")
+            debug_logs.append(mafft_output)
             continue
+        
+        debug_logs.append(f"Temps d'exécution : {execution_time:.2f} secondes")
+        debug_logs.append(f"Sortie MAFFT : {mafft_output}")
         
         final_score, conservation_score, gap_penalty, complexity_score = evaluate_alignment(output_file)
         if final_score is None:
@@ -266,6 +274,13 @@ def main():
             f.write(f"Alignement {i}:\n{cmd}\n\n")
 
     print(f"\nLes commandes MAFFT utilisées ont été sauvegardées dans : {mafft_commands_file}")
+
+    # Écriture du fichier de logs de débogage
+    debug_log_file = os.path.join(output_dir, "debug_logs.txt")
+    with open(debug_log_file, 'w') as f:
+        f.write("\n".join(debug_logs))
+
+    print(f"\nLes logs de débogage ont été sauvegardés dans : {debug_log_file}")
 
 if __name__ == "__main__":
     main()
