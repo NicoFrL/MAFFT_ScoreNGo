@@ -1,0 +1,5 @@
+# Required external library
+biopython==1.81
+
+# Note: Tkinter and MAFFT are not included here as they require system-specific installation.
+# Please refer to the README.md for installation instructions for these dependencies.
