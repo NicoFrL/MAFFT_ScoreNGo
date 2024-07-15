@@ -65,7 +65,7 @@ MAFFT must be installed separately and be available in your system PATH. Install
 - On macOS with [Homebrew](https://brew.sh):  
   brew install mafft
 
-- On Ubuntu/Debian Linux:
+- On Ubuntu/Debian Linux:  
   sudo apt-get install mafft
 
 - For other systems or for manual installation, please refer to the MAFFT official website: https://mafft.cbrc.jp/alignment/software/
