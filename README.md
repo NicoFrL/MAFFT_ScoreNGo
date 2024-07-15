@@ -62,7 +62,7 @@ Tkinter is usually included with Python, but on some systems, it may need to be 
 
 MAFFT must be installed separately and be available in your system PATH. Installation instructions vary by operating system:
 
-- On macOS with [Homebrew](https://brew.sh):
+- On macOS with [Homebrew](https://brew.sh): 
   brew install mafft
 
 - On Ubuntu/Debian Linux:
