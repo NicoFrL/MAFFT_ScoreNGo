@@ -54,9 +54,9 @@ Additional parameters:
 
 MAFFT_ScoreNGo offers three screening levels:
 
-1. Light: Quick screening with fewer parameter combinations.
-2. Standard: Balanced screening with a moderate number of combinations.
-3. Aggressive: Thorough screening with many parameter combinations.
+1. Light: Quick screening with fewer parameter combinations (13 combinations).
+2. Standard: Balanced screening with a moderate number of combinations (337 combinations).
+3. Aggressive: Thorough screening with many parameter combinations (2497 combinations).
 
 The specific parameters tested depend on the chosen screening level.
 
@@ -64,14 +64,61 @@ The specific parameters tested depend on the chosen screening level.
 
 MAFFT_ScoreNGo evaluates each alignment using a custom scoring algorithm that considers the following factors:
 
-1. Conservation Score: Measures the similarity of amino acids in each column of the alignment using the BLOSUM62 substitution matrix.
-2. Gap Penalty: Penalizes the presence of gaps, with additional penalties for isolated gaps.
-3. Complexity Score: Measures the diversity of amino acids in each column.
+1. Weighted Conservation Score (WCS)
+2. Gap Penalty (GP)
+3. Complexity Score (CX)
 
-The final score is calculated as:
-Final Score = Conservation Score - Gap Penalty + Complexity Score
+### 1. Weighted Conservation Score (WCS)
 
-For each set of MAFFT parameters, MAFFT_ScoreNGo runs the alignment and calculates this score. The parameter set that produces the highest final score is considered the optimal alignment strategy for the given dataset.
+The Weighted Conservation Score is calculated as follows:
+
+    WCS = (1/N) * Σ(i=1 to N) [WCS'(i) / (L * (L-1))]
+
+Where:
+- WCS is the final Weighted Conservation Score for the entire alignment
+- N is the total number of columns in the alignment
+- L is the number of sequences in the alignment
+- WCS'(i) is the raw Weighted Conservation Score for column i, calculated as:
+
+    WCS'(i) = Σ(a,b) [count(a) * count(b) * BLOSUM62(a,b)]
+
+Where:
+- a and b are amino acids in column i
+- count(x) is the number of occurrences of amino acid x in column i
+- BLOSUM62(a,b) is the substitution score between a and b in the BLOSUM62 matrix
+
+### 2. Gap Penalty (GP)
+
+The Gap Penalty Score is calculated as follows:
+
+    GP = (1/N) * Σ(i=1 to N) [(g_i / L) + 0.5 * I(i)]
+
+Where:
+- GP is the final Gap Penalty Score
+- N is the total number of columns in the alignment
+- g_i is the number of gaps in column i
+- L is the number of sequences in the alignment
+- I(i) is an indicator function that equals 1 if the gap in column i is isolated (no gap in the previous column), and 0 otherwise
+
+### 3. Complexity Score (CX)
+
+The Complexity Score is calculated as follows:
+
+    CX = (1/N) * Σ(i=1 to N) (u_i / L)
+
+Where:
+- CX is the final Complexity Score
+- N is the total number of columns in the alignment
+- u_i is the number of unique amino acids in column i
+- L is the number of sequences in the alignment
+
+### Final Score
+
+The Final Score is calculated as follows:
+
+    Final Score = WCS - GP + CX
+
+For each set of MAFFT parameters, MAFFT_ScoreNGo runs the alignment and calculates this score. The parameter set that produces the highest Final Score is considered the optimal alignment strategy for the given dataset.
 
 ## Interpretation of Results
 
