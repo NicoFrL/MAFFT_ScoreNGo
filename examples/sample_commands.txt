@@ -1,0 +1,39 @@
+Alignment 1:
+mafft --genafpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1   "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_1.fasta"
+
+Alignment 2:
+mafft --genafpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1   "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_2.fasta"
+
+Alignment 3:
+mafft --genafpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1   "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_3.fasta"
+
+Alignment 4:
+mafft --genafpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1   "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_4.fasta"
+
+Alignment 5:
+mafft --localpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1  "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_5.fasta"
+
+Alignment 6:
+mafft --localpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1  "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_6.fasta"
+
+Alignment 7:
+mafft --localpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1  "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_7.fasta"
+
+Alignment 8:
+mafft --localpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1  "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_8.fasta"
+
+Alignment 9:
+mafft --globalpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1 "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_9.fasta"
+
+Alignment 10:
+mafft --globalpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1 "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_10.fasta"
+
+Alignment 11:
+mafft --globalpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1 "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_11.fasta"
+
+Alignment 12:
+mafft --globalpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1 "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_12.fasta"
+
+Alignment 13:
+mafft --ep 0 --genafpair --maxiterate 1000 --thread -1 "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/sample_input.fasta" > "/Users/Nico/Documents/Finalized Script and App/MAFFT_ScoreNGo/mafft_results/alignment_13.fasta"
+

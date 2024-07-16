@@ -1,0 +1,122 @@
+Ranking of the 13 best alignments:
+==================================================
+
+Rank 1:
+Combination 8:
+Parameters: --localpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1 
+Final score: 2.3455
+Execution time: 1.20 seconds
+Conservation score: 2.5042
+Gap penalty: 0.2377
+Complexity score: 0.0790
+
+Rank 2:
+Combination 6:
+Parameters: --localpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1 
+Final score: 2.3217
+Execution time: 1.06 seconds
+Conservation score: 2.4872
+Gap penalty: 0.2439
+Complexity score: 0.0784
+
+Rank 3:
+Combination 3:
+Parameters: --genafpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1  
+Final score: 2.3191
+Execution time: 0.94 seconds
+Conservation score: 2.4847
+Gap penalty: 0.2444
+Complexity score: 0.0788
+
+Rank 4:
+Combination 5:
+Parameters: --localpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1 
+Final score: 2.3042
+Execution time: 1.05 seconds
+Conservation score: 2.4738
+Gap penalty: 0.2479
+Complexity score: 0.0784
+
+Rank 5:
+Combination 4:
+Parameters: --genafpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1  
+Final score: 2.2908
+Execution time: 1.12 seconds
+Conservation score: 2.4633
+Gap penalty: 0.2509
+Complexity score: 0.0784
+
+Rank 6:
+Combination 9:
+Parameters: --globalpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1
+Final score: 2.2895
+Execution time: 0.99 seconds
+Conservation score: 2.4597
+Gap penalty: 0.2492
+Complexity score: 0.0789
+
+Rank 7:
+Combination 7:
+Parameters: --localpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1 
+Final score: 2.2849
+Execution time: 1.06 seconds
+Conservation score: 2.4566
+Gap penalty: 0.2501
+Complexity score: 0.0784
+
+Rank 8:
+Combination 10:
+Parameters: --globalpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1
+Final score: 2.2648
+Execution time: 1.02 seconds
+Conservation score: 2.4418
+Gap penalty: 0.2553
+Complexity score: 0.0783
+
+Rank 9:
+Combination 11:
+Parameters: --globalpair --bl 80 --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1
+Final score: 2.2606
+Execution time: 0.93 seconds
+Conservation score: 2.4368
+Gap penalty: 0.2548
+Complexity score: 0.0786
+
+Rank 10:
+Combination 1:
+Parameters: --genafpair  --op 1.53 --ep 0  --retree 2 --maxiterate 1000 --thread -1  
+Final score: 2.2491
+Execution time: 1.39 seconds
+Conservation score: 2.4321
+Gap penalty: 0.2608
+Complexity score: 0.0778
+
+Rank 11:
+Combination 12:
+Parameters: --globalpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1
+Final score: 2.2382
+Execution time: 0.92 seconds
+Conservation score: 2.4197
+Gap penalty: 0.2599
+Complexity score: 0.0785
+
+Rank 12:
+Combination 13:
+Parameters: --ep 0 --genafpair --maxiterate 1000 --thread -1
+Final score: 2.2224
+Execution time: 1.08 seconds
+Conservation score: 2.4122
+Gap penalty: 0.2671
+Complexity score: 0.0773
+
+Rank 13:
+Combination 2:
+Parameters: --genafpair  --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1  
+Final score: 2.1795
+Execution time: 1.06 seconds
+Conservation score: 2.3800
+Gap penalty: 0.2769
+Complexity score: 0.0764
+
+Best combination: 8
+Parameters: --localpair --bl 80 --op 1.53 --ep 0.123  --retree 2 --maxiterate 1000 --thread -1 
