@@ -126,7 +126,7 @@ After installation, verify MAFFT is accessible by running:
 ```mafft --version```
 
 ## Performance
-`MAFFT_ScoreNGo.py` was tested with [dataset_seq_example.fasta](./dataset_seq_example.fasta), containing 69 sequences with an average length of 438 amino acids, using macOS Sonoma on an ARM M1 Max (10-core CPU, 32-core GPU) with 32 GB of RAM. With this configuration, it took 25 seconds to run the Light screening level (13 alignments) and perform the scoring assessment.
+`MAFFT_ScoreNGo.py` was tested with [sample_input](examples/sample_input.fasta), containing 69 sequences with an average length of 438 amino acids, using macOS Sonoma on an ARM M1 Max (10-core CPU, 32-core GPU) with 32 GB of RAM. With this configuration, it took 25 seconds to run the Light screening level (13 alignments) and perform the scoring assessment.
 Don't forget to "[caffeinate](https://www.theapplegeek.co.uk/blog/caffeinate)" your Mac! (or use [systemd-inhibit](https://evanhahn.com/systemd-inhibit-alternative-to-macos-caffeinate/) on your Linux machine).
 
 ## Language
