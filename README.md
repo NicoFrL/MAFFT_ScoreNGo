@@ -136,7 +136,7 @@ Feel free to use `MAFFT_ScoreNGo_FR.py` which is the French version of `MAFFT_Sc
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
