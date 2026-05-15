@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import subprocess
 import time
@@ -8,16 +11,18 @@ import tkinter as tk
 from tkinter import filedialog
 from collections import Counter
 
-def select_file():
+def select_files():
+    """Select one or multiple FASTA files"""
     root = tk.Tk()
     root.withdraw()
-    file_path = filedialog.askopenfilename(
-        title="Select input FASTA file",
-        filetypes=[("FASTA files", "*.fasta *.fa *.fna *.ffn *.faa *.frn")]
+    file_paths = filedialog.askopenfilenames(  # Changed to askopenfilenames (plural)
+        title="Sélectionnez le(s) fichier(s) FASTA d'entrée",
+        filetypes=[("Fichiers FASTA", "*.fasta *.fa *.fna *.ffn *.faa *.frn")]
     )
-    return os.path.abspath(file_path)
+    return [os.path.abspath(fp) for fp in file_paths]
 
 def run_mafft(input_file, output_file, params):
+    """Execute MAFFT with given parameters"""
     start_time = time.time()
     cmd = f"mafft {params} \"{input_file}\" > \"{output_file}\""
     try:
@@ -25,10 +30,11 @@ def run_mafft(input_file, output_file, params):
         end_time = time.time()
         return end_time - start_time, result.stderr
     except subprocess.CalledProcessError as e:
-        print(f"Error while executing MAFFT: {e}")
+        print(f"Erreur lors de l'exécution de MAFFT: {e}")
         return None, e.stderr
 
 def evaluate_alignment(alignment_file):
+    """Evaluate alignment quality using multiple metrics"""
     try:
         alignment = AlignIO.read(alignment_file, "fasta")
         
@@ -42,7 +48,7 @@ def evaluate_alignment(alignment_file):
             column = alignment[:, i]
             char_counts = Counter(column)
             
-            # Weighted conservation score
+            # Score de conservation pondéré
             col_score = 0
             for a in char_counts:
                 for b in char_counts:
@@ -53,31 +59,32 @@ def evaluate_alignment(alignment_file):
                             col_score += char_counts[a] * char_counts[b] * blosum[(b, a)]
             conservation_score += col_score / (len(alignment) * (len(alignment) - 1))
             
-            # Gap penalty
+            # Pénalité de gap
             gap_count = char_counts.get('-', 0)
             if gap_count > 0:
                 gap_penalty += gap_count / len(alignment)
                 if i > 0 and '-' not in alignment[:, i-1]:
-                    gap_penalty += 0.5  # Additional penalty for isolated gap
+                    gap_penalty += 0.5  # Pénalité supplémentaire pour gap isolé
             
-            # Column complexity
+            # Complexité de colonne
             complexity_score += len(char_counts) / len(alignment)
         
         conservation_score /= alignment.get_alignment_length()
         gap_penalty /= alignment.get_alignment_length()
         complexity_score /= alignment.get_alignment_length()
         
-        # Final score
+        # Score final
         final_score = conservation_score - gap_penalty + complexity_score
         
         return final_score, conservation_score, gap_penalty, complexity_score
     except Exception as e:
-        print(f"Error while evaluating the alignment: {e}")
+        print(f"Erreur lors de l'évaluation de l'alignement: {e}")
         return None, None, None, None
 
 def get_mafft_combinations(screening_level):
+    """Generate MAFFT parameter combinations based on screening level"""
     strategies = ["--genafpair", "--localpair", "--globalpair"]
-    matrices = ["", "--bl 80"]  # "" for BLOSUM62 (default), "--bl 80" for BLOSUM80
+    matrices = ["", "--bl 80"]  # "" pour BLOSUM62 (défaut), "--bl 80" pour BLOSUM80
 
     if screening_level == "light":
         gap_opens = ["--op 1.53"]
@@ -122,94 +129,61 @@ def get_mafft_combinations(screening_level):
                             else:
                                 combinations.append(base_params)
     
-    # Explicit addition of E-INS-i
+    # Ajout explicite de E-INS-i
     combinations.append("--ep 0 --genafpair --maxiterate 1000 --thread -1")
     
     return combinations
 
-def main():
-    input_file = select_file()
-    if not input_file:
-        print("No file selected. The program is terminating.")
-        return
-
-    print("Choose the screening level:")
-    print("1. Light")
-    print("2. Standard")
-    print("3. Aggressive")
-    
-    choice = input("Enter your choice (1, 2 or 3): ")
-    
-    if choice == "1":
-        level = "light"
-    elif choice == "2":
-        level = "standard"
-    elif choice == "3":
-        level = "aggressive"
-    else:
-        print("Invalid choice. Using standard level.")
-        level = "standard"
-    
+def process_single_file(input_file, level, custom_params, skip_confirmation=False):
+    """Process a single FASTA file with all parameter combinations"""
     combinations = get_mafft_combinations(level)
     
-    # Request for custom parameter
-    print("\nDo you want to add a specific parameter line to compare?")
-    print("(Enter your parameters and press Enter. If nothing happens, press Enter a second time.)")
-    print("(Leave empty and press Enter to ignore.)")
-    
-    custom_params = []
-    while True:
-        line = input("Custom parameters: ").strip()
-        if line:
-            custom_params.append(line)
-        else:
-            break
-    
-    custom_params = " ".join(custom_params)
     if custom_params:
         combinations.append(custom_params)
-        print(f"Custom parameters added: {custom_params}")
-    else:
-        print("No custom parameters added.")
+        print(f"Paramètres personnalisés ajoutés : {custom_params}")
     
-    print(f"\nTotal number of combinations: {len(combinations)}")
+    print(f"\nNombre total de combinaisons pour {os.path.basename(input_file)}: {len(combinations)}")
     
-    while True:
-        confirmation = input("Do you confirm this number of combinations? (Y/N): ").strip().lower()
-        if confirmation == 'y':
-            break
-        elif confirmation == 'n':
-            print("Operation cancelled by the user.")
-            return
-        else:
-            print("Invalid response. Please answer 'Y' for yes or 'N' for no.")
-
+    # Ask for confirmation only for the first file
+    if not skip_confirmation:
+        while True:
+            confirmation = input("Validez-vous ce nombre de combinaisons ? (Y/N) : ").strip().lower()
+            if confirmation == 'y':
+                break
+            elif confirmation == 'n':
+                print("Traitement annulé pour ce fichier.")
+                return False
+            else:
+                print("Réponse invalide. Veuillez répondre par 'Y' pour oui ou 'N' pour non.")
+    
+    # Create output directory with input file name
+    base_name = os.path.splitext(os.path.basename(input_file))[0]
+    output_dir = os.path.join(os.path.dirname(input_file), f"mafft_results_{base_name}")
+    os.makedirs(output_dir, exist_ok=True)
+    
     results = {}
     mafft_commands = {}
     debug_logs = []
 
-    output_dir = os.path.join(os.path.dirname(input_file), "mafft_results")
-    os.makedirs(output_dir, exist_ok=True)
-
     for i, params in enumerate(combinations, 1):
         output_file = os.path.join(output_dir, f"alignment_{i}.fasta")
         
-        print(f"\nExecuting combination {i}/{len(combinations)}:")
-        print(f"Parameters: {params}")
+        print(f"\nExécution de la combinaison {i}/{len(combinations)}:")
+        print(f"Paramètres : {params}")
         
-        debug_logs.append(f"\nExecuting combination {i}/{len(combinations)}:")
-        debug_logs.append(f"Parameters: {params}")
+        debug_logs.append(f"\nExécution de la combinaison {i}/{len(combinations)}:")
+        debug_logs.append(f"Paramètres : {params}")
         
         mafft_commands[i] = f"mafft {params} \"{input_file}\" > \"{output_file}\""
         
         execution_time, mafft_output = run_mafft(input_file, output_file, params)
         if execution_time is None:
-            debug_logs.append(f"Execution failed for combination {i}")
+            debug_logs.append(f"Échec de l'exécution pour la combinaison {i}")
             debug_logs.append(mafft_output)
             continue
         
-        debug_logs.append(f"Execution time: {execution_time:.2f} seconds")
-        debug_logs.append(f"MAFFT output: {mafft_output}")
+        debug_logs.append(f"Temps d'exécution : {execution_time:.2f} secondes")
+        debug_logs.append(f"Sortie MAFFT : {mafft_output}")
         
         final_score, conservation_score, gap_penalty, complexity_score = evaluate_alignment(output_file)
         if final_score is None:
@@ -225,60 +199,148 @@ def main():
         }
 
     if not results:
-        print("No results were obtained. Check the errors above.")
-        return
+        print("Aucun résultat n'a été obtenu. Vérifiez les erreurs ci-dessus.")
+        return True
 
-    # Sort results by descending final score
+    # Tri des résultats par score final décroissant
     sorted_results = sorted(results.items(), key=lambda x: x[1]['final_score'], reverse=True)
 
-    print("\nRanking of the 13 best alignments:")
+    print("\nClassement des 13 meilleurs alignements :")
     print("=" * 50)
     for i, (combo, res) in enumerate(sorted_results[:13], 1):
-        print(f"\nRank {i}:")
+        print(f"\nRang {i}:")
         print(f"Combination {combo}:")
-        print(f"Parameters: {res['params']}")
-        print(f"Final score: {res['final_score']:.4f}")
-        print(f"Execution time: {res['execution_time']:.2f} seconds")
-        print(f"Conservation score: {res['conservation_score']:.4f}")
-        print(f"Gap penalty: {res['gap_penalty']:.4f}")
-        print(f"Complexity score: {res['complexity_score']:.4f}")
+        print(f"Paramètres : {res['params']}")
+        print(f"Score final : {res['final_score']:.4f}")
+        print(f"Temps d'exécution : {res['execution_time']:.2f} secondes")
+        print(f"Score de conservation : {res['conservation_score']:.4f}")
+        print(f"Pénalité de gap : {res['gap_penalty']:.4f}")
+        print(f"Score de complexité : {res['complexity_score']:.4f}")
 
     best_combo = sorted_results[0][0]
-    print(f"\nThe combination with the best final score is: {best_combo}")
-    print(f"Parameters: {results[best_combo]['params']}")
+    print(f"\nLa combinaison avec le meilleur score final est : {best_combo}")
+    print(f"Paramètres : {results[best_combo]['params']}")
 
+    # Save results to file
     results_file = os.path.join(output_dir, "mafft_results_summary.txt")
-    with open(results_file, 'w') as f:
-        f.write("Ranking of the 13 best alignments:\n")
+    with open(results_file, 'w', encoding='utf-8') as f:
+        f.write(f"Fichier traité : {os.path.basename(input_file)}\n")
+        f.write("=" * 50 + "\n")
+        f.write("Classement des 13 meilleurs alignements :\n")
         f.write("=" * 50 + "\n")
         for i, (combo, res) in enumerate(sorted_results[:13], 1):
-            f.write(f"\nRank {i}:\n")
+            f.write(f"\nRang {i}:\n")
             f.write(f"Combination {combo}:\n")
-            f.write(f"Parameters: {res['params']}\n")
-            f.write(f"Final score: {res['final_score']:.4f}\n")
-            f.write(f"Execution time: {res['execution_time']:.2f} seconds\n")
-            f.write(f"Conservation score: {res['conservation_score']:.4f}\n")
-            f.write(f"Gap penalty: {res['gap_penalty']:.4f}\n")
-            f.write(f"Complexity score: {res['complexity_score']:.4f}\n")
-        f.write(f"\nBest combination: {best_combo}\n")
-        f.write(f"Parameters: {results[best_combo]['params']}\n")
+            f.write(f"Paramètres : {res['params']}\n")
+            f.write(f"Score final : {res['final_score']:.4f}\n")
+            f.write(f"Temps d'exécution : {res['execution_time']:.2f} secondes\n")
+            f.write(f"Score de conservation : {res['conservation_score']:.4f}\n")
+            f.write(f"Pénalité de gap : {res['gap_penalty']:.4f}\n")
+            f.write(f"Score de complexité : {res['complexity_score']:.4f}\n")
+        f.write(f"\nMeilleure combinaison : {best_combo}\n")
+        f.write(f"Paramètres : {results[best_combo]['params']}\n")
 
-    print(f"\nDetailed results have been saved in: {results_file}")
+    print(f"\nLes résultats détaillés ont été sauvegardés dans : {results_file}")
 
-    # Write summary file of MAFFT commands
+    # Save MAFFT commands
     mafft_commands_file = os.path.join(output_dir, "mafft_commands.txt")
-    with open(mafft_commands_file, 'w') as f:
+    with open(mafft_commands_file, 'w', encoding='utf-8') as f:
+        f.write(f"Commandes MAFFT pour : {os.path.basename(input_file)}\n")
+        f.write("=" * 50 + "\n\n")
         for i, cmd in mafft_commands.items():
-            f.write(f"Alignment {i}:\n{cmd}\n\n")
+            f.write(f"Alignement {i}:\n{cmd}\n\n")
 
-    print(f"\nThe MAFFT commands used have been saved in: {mafft_commands_file}")
+    print(f"Les commandes MAFFT utilisées ont été sauvegardées dans : {mafft_commands_file}")
 
-    # Write debug log file
+    # Save debug logs
     debug_log_file = os.path.join(output_dir, "debug_logs.txt")
-    with open(debug_log_file, 'w') as f:
+    with open(debug_log_file, 'w', encoding='utf-8') as f:
+        f.write(f"Logs de débogage pour : {os.path.basename(input_file)}\n")
+        f.write("=" * 50 + "\n")
         f.write("\n".join(debug_logs))
 
-    print(f"\nDebug logs have been saved in: {debug_log_file}")
+    print(f"Les logs de débogage ont été sauvegardés dans : {debug_log_file}")
+    
+    return True
+
+def main():
+    """Main function to coordinate batch processing"""
+    input_files = select_files()
+    if not input_files:
+        print("Aucun fichier sélectionné. Le programme se termine.")
+        return
+    
+    print(f"\n{len(input_files)} fichier(s) sélectionné(s):")
+    for file in input_files:
+        print(f"  - {os.path.basename(file)}")
+    
+    # Ask for screening level once for all files
+    print("\nChoisissez le niveau de screening :")
+    print("1. Léger")
+    print("2. Standard")
+    print("3. Agressif")
+    
+    choice = input("Entrez votre choix (1, 2 ou 3) : ")
+    
+    if choice == "1":
+        level = "light"
+    elif choice == "2":
+        level = "standard"
+    elif choice == "3":
+        level = "aggressive"
+    else:
+        print("Choix invalide. Utilisation du niveau standard.")
+        level = "standard"
+    
+    # Ask for custom parameters once
+    print("\nVoulez-vous ajouter une ligne de paramètres spécifique à comparer ?")
+    print("(Entrez vos paramètres et appuyez sur Entrée. Si rien ne se passe, appuyez sur Entrée une seconde fois.)")
+    print("(Laissez vide et appuyez sur Entrée pour ignorer.)")
+    
+    custom_params = []
+    while True:
+        line = input("Paramètres personnalisés : ").strip()
+        if line:
+            custom_params.append(line)
+        else:
+            break
+    
+    custom_params = " ".join(custom_params)
+    
+    # Process each file
+    successful_files = []
+    failed_files = []
+    
+    for file_index, input_file in enumerate(input_files, 1):
+        print(f"\n{'='*60}")
+        print(f"Traitement du fichier {file_index}/{len(input_files)}: {os.path.basename(input_file)}")
+        print(f"{'='*60}")
+        
+        # Only ask for confirmation on the first file
+        skip_confirmation = (file_index > 1)
+        
+        success = process_single_file(input_file, level, custom_params, skip_confirmation)
+        
+        if success:
+            successful_files.append(input_file)
+        else:
+            failed_files.append(input_file)
+    
+    # Final summary
+    print(f"\n{'='*60}")
+    print("RÉSUMÉ DU TRAITEMENT BATCH")
+    print(f"{'='*60}")
+    print(f"\nFichiers traités avec succès ({len(successful_files)}):")
+    for file in successful_files:
+        print(f"  ✓ {os.path.basename(file)}")
+    
+    if failed_files:
+        print(f"\nFichiers échoués ou annulés ({len(failed_files)}):")
+        for file in failed_files:
+            print(f"  ✗ {os.path.basename(file)}")
+    
+    print(f"\nTraitement terminé!")
+    print(f"Total: {len(successful_files)}/{len(input_files)} fichiers traités avec succès")
 
 if __name__ == "__main__":
     main()
