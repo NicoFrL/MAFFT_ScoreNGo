@@ -1,5 +1,8 @@
-# Required external library
-biopython==1.81
+# Required Python libraries
+biopython>=1.81
+numpy>=1.24
+scipy>=1.10
+tqdm>=4.65
 
 # Note: Tkinter and MAFFT are not included here as they require system-specific installation.
 # Please refer to the README.md for installation instructions for these dependencies.
