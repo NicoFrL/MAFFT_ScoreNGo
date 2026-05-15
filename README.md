@@ -11,7 +11,7 @@ Created by Nicolas-Frédéric Lipp, PhD.
 `MAFFT_ScoreNGo` performs systematic exploration of MAFFT alignment parameters to find the best alignment strategy for your dataset. The workflow is split into two complementary scripts:
 
 1. **`MAFFT_ScoreNGo.py`** — generates alignments across many MAFFT parameter combinations, with support for batch processing of multiple FASTA files.
-2. **`MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py`** — re-scores those alignments using rigorous, multi-metric evaluation (exact Jalview conservation and quality algorithms, Sum-of-Pairs, parsimony-informative sites, and more) to identify the optimal alignment.
+2. **`AlignmentScorerWithJalview.py`** — re-scores those alignments using rigorous, multi-metric evaluation (exact Jalview conservation and quality algorithms, Sum-of-Pairs, parsimony-informative sites, and more) to identify the optimal alignment.
 
 This separation allows fast iteration on alignment generation while applying more sophisticated scoring methods as a distinct, reproducible step.
 
@@ -26,7 +26,7 @@ This separation allows fast iteration on alignment generation while applying mor
 - Separate output directories per input file
 - Comprehensive logging of MAFFT commands and execution
 
-### MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py — Rigorous alignment scorer
+### AlignmentScorerWithJalview.py — Rigorous alignment scorer
 - **Exact Jalview conservation** (per-column 0–11 scores based on 10 physicochemical property classes, AMAS-derived scheme)
 - **Exact Jalview quality** (per-column BLOSUM62-based quality)
 - Sum-of-Pairs score (BLOSUM62)
@@ -99,7 +99,7 @@ For each input file, a folder named `mafft_results_<basename>/` is created next 
 ### Step 2 — Score alignments and identify the best
 
 ```
-python3 MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py
+python3 AlignmentScorerWithJalview.py
 ```
 
 When prompted:
@@ -120,7 +120,7 @@ The scorer will evaluate every `alignment_*.fasta` file and produce:
 | `mafft_commands.txt` | All MAFFT commands executed |
 | `debug_logs.txt` | Execution logs and MAFFT stderr output |
 
-### From `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py`
+### From `AlignmentScorerWithJalview.py`
 | File | Description |
 | --- | --- |
 | `alignment_scores_EXACT_JALVIEW.txt` | Full scoring results, ranking by three methods, and consensus best alignment |
@@ -172,7 +172,7 @@ If the command is not found, install MAFFT:
 ## Performance Notes
 
 - `MAFFT_ScoreNGo.py` runtime scales linearly with the number of parameter combinations. Light screening typically completes in under a minute for ~70 sequences of ~400 residues; Aggressive can take significantly longer.
-- `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py` uses parallel processing (one process per Performance core on Apple Silicon; bounded on other systems) and processes alignments in chunks of 50 to keep memory usage stable.
+- `AlignmentScorerWithJalview.py` uses parallel processing (one process per Performance core on Apple Silicon; bounded on other systems) and processes alignments in chunks of 50 to keep memory usage stable.
 - For very large datasets (>200 sequences), consider running on a server or workstation rather than a laptop.
 - Don't forget to "[caffeinate](https://www.theapplegeek.co.uk/blog/caffeinate)" your Mac during long runs (or use [systemd-inhibit](https://evanhahn.com/systemd-inhibit-alternative-to-macos-caffeinate/) on Linux).
 
@@ -184,7 +184,7 @@ Example input files are provided in the `examples/` directory. To reproduce the 
 
 1. Run `MAFFT_ScoreNGo.py` and select `examples/sample_input.fasta`.
 2. Choose **Light** screening (fastest).
-3. After completion, run `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py` and point it to the resulting `mafft_results_sample_input/` folder.
+3. After completion, run `AlignmentScorerWithJalview.py` and point it to the resulting `mafft_results_sample_input/` folder.
 
 ---
 
@@ -221,7 +221,7 @@ Nicolas-Frédéric Lipp, PhD
 
 ## Acknowledgements
 
-The exact Jalview conservation and quality algorithms in `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py` are re-implementations of the algorithms described in:
+The exact Jalview conservation and quality algorithms in `AlignmentScorerWithJalview.py` are re-implementations of the algorithms described in:
 
 - Livingstone, C. D. & Barton, G. J. (1993) *Protein sequence alignments: a strategy for the hierarchical analysis of residue conservation.* Comput. Appl. Biosci. 9, 745–756.
 - Waterhouse, A. M., Procter, J. B., Martin, D. M. A., Clamp, M. & Barton, G. J. (2009) *Jalview Version 2 — a multiple sequence alignment editor and analysis workbench.* Bioinformatics 25, 1189–1191.

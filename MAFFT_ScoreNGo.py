@@ -12,8 +12,8 @@ def select_files():
     root = tk.Tk()
     root.withdraw()
     file_paths = filedialog.askopenfilenames(
-        title="Sélectionnez le(s) fichier(s) FASTA d'entrée",
-        filetypes=[("Fichiers FASTA", "*.fasta *.fa *.fna *.ffn *.faa *.frn")]
+        title="Select input FASTA file(s)",
+        filetypes=[("FASTA files", "*.fasta *.fa *.fna *.ffn *.faa *.frn")]
     )
     return [os.path.abspath(fp) for fp in file_paths]
 
@@ -26,13 +26,13 @@ def run_mafft(input_file, output_file, params):
         end_time = time.time()
         return end_time - start_time, result.stderr
     except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'exécution de MAFFT: {e}")
+        print(f"Error executing MAFFT: {e}")
         return None, e.stderr
 
 def get_mafft_combinations(screening_level):
     """Generate MAFFT parameter combinations based on screening level"""
     strategies = ["--genafpair", "--localpair", "--globalpair"]
-    matrices = ["", "--bl 80"]  # "" pour BLOSUM62 (défaut), "--bl 80" pour BLOSUM80
+    matrices = ["", "--bl 80"]  # "" for BLOSUM62 (default), "--bl 80" for BLOSUM80
 
     if screening_level == "light":
         gap_opens = ["--op 1.53"]
@@ -77,7 +77,7 @@ def get_mafft_combinations(screening_level):
                             else:
                                 combinations.append(base_params)
 
-    # Ajout explicite de E-INS-i
+    # Explicitly add E-INS-i
     combinations.append("--ep 0 --genafpair --maxiterate 1000 --thread -1")
 
     return combinations
@@ -88,21 +88,21 @@ def process_single_file(input_file, level, custom_params, skip_confirmation=Fals
 
     if custom_params:
         combinations.append(custom_params)
-        print(f"Paramètres personnalisés ajoutés : {custom_params}")
+        print(f"Custom parameters added: {custom_params}")
 
-    print(f"\nNombre total de combinaisons pour {os.path.basename(input_file)}: {len(combinations)}")
+    print(f"\nTotal number of combinations for {os.path.basename(input_file)}: {len(combinations)}")
 
     # Ask for confirmation only for the first file
     if not skip_confirmation:
         while True:
-            confirmation = input("Validez-vous ce nombre de combinaisons ? (Y/N) : ").strip().lower()
+            confirmation = input("Confirm this number of combinations? (Y/N): ").strip().lower()
             if confirmation == 'y':
                 break
             elif confirmation == 'n':
-                print("Traitement annulé pour ce fichier.")
+                print("Processing cancelled for this file.")
                 return False
             else:
-                print("Réponse invalide. Veuillez répondre par 'Y' pour oui ou 'N' pour non.")
+                print("Invalid response. Please answer 'Y' for yes or 'N' for no.")
 
     # Create output directory with input file name
     base_name = os.path.splitext(os.path.basename(input_file))[0]
@@ -115,45 +115,45 @@ def process_single_file(input_file, level, custom_params, skip_confirmation=Fals
     for i, params in enumerate(combinations, 1):
         output_file = os.path.join(output_dir, f"alignment_{i}.fasta")
 
-        print(f"\nExécution de la combinaison {i}/{len(combinations)}:")
-        print(f"Paramètres : {params}")
+        print(f"\nRunning combination {i}/{len(combinations)}:")
+        print(f"Parameters: {params}")
 
-        debug_logs.append(f"\nExécution de la combinaison {i}/{len(combinations)}:")
-        debug_logs.append(f"Paramètres : {params}")
+        debug_logs.append(f"\nRunning combination {i}/{len(combinations)}:")
+        debug_logs.append(f"Parameters: {params}")
 
         mafft_commands[i] = f"mafft {params} \"{input_file}\" > \"{output_file}\""
 
         execution_time, mafft_output = run_mafft(input_file, output_file, params)
         if execution_time is None:
-            debug_logs.append(f"Échec de l'exécution pour la combinaison {i}")
+            debug_logs.append(f"Execution failed for combination {i}")
             debug_logs.append(mafft_output)
             continue
 
-        debug_logs.append(f"Temps d'exécution : {execution_time:.2f} secondes")
-        debug_logs.append(f"Sortie MAFFT : {mafft_output}")
+        debug_logs.append(f"Execution time: {execution_time:.2f} seconds")
+        debug_logs.append(f"MAFFT output: {mafft_output}")
 
     # Save MAFFT commands
     mafft_commands_file = os.path.join(output_dir, "mafft_commands.txt")
     with open(mafft_commands_file, 'w', encoding='utf-8') as f:
-        f.write(f"Commandes MAFFT pour : {os.path.basename(input_file)}\n")
+        f.write(f"MAFFT commands for: {os.path.basename(input_file)}\n")
         f.write("=" * 50 + "\n\n")
         for i, cmd in mafft_commands.items():
-            f.write(f"Alignement {i}:\n{cmd}\n\n")
+            f.write(f"Alignment {i}:\n{cmd}\n\n")
 
-    print(f"\nLes commandes MAFFT utilisées ont été sauvegardées dans : {mafft_commands_file}")
+    print(f"\nMAFFT commands saved to: {mafft_commands_file}")
 
     # Save debug logs
     debug_log_file = os.path.join(output_dir, "debug_logs.txt")
     with open(debug_log_file, 'w', encoding='utf-8') as f:
-        f.write(f"Logs de débogage pour : {os.path.basename(input_file)}\n")
+        f.write(f"Debug logs for: {os.path.basename(input_file)}\n")
         f.write("=" * 50 + "\n")
         f.write("\n".join(debug_logs))
 
-    print(f"Les logs de débogage ont été sauvegardés dans : {debug_log_file}")
-    print(f"\nAlignements sauvegardés dans : {output_dir}")
-    print("➡  Pour scorer et identifier le meilleur alignement, utilisez :")
-    print("   MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py")
-    print("   (disponible dans ce dépôt : https://github.com/NicoFrL/MAFFT_ScoreNGo)")
+    print(f"Debug logs saved to: {debug_log_file}")
+    print(f"\nAlignments saved to: {output_dir}")
+    print("➡  To score and identify the best alignment, use:")
+    print("   AlignmentScorerWithJalview.py")
+    print("   (available in this repository: https://github.com/NicoFrL/MAFFT_ScoreNGo)")
 
     return True
 
@@ -161,20 +161,20 @@ def main():
     """Main function to coordinate batch processing"""
     input_files = select_files()
     if not input_files:
-        print("Aucun fichier sélectionné. Le programme se termine.")
+        print("No file selected. Exiting.")
         return
 
-    print(f"\n{len(input_files)} fichier(s) sélectionné(s):")
+    print(f"\n{len(input_files)} file(s) selected:")
     for file in input_files:
         print(f"  - {os.path.basename(file)}")
 
     # Ask for screening level once for all files
-    print("\nChoisissez le niveau de screening :")
-    print("1. Léger")
+    print("\nChoose screening level:")
+    print("1. Light")
     print("2. Standard")
-    print("3. Agressif")
+    print("3. Aggressive")
 
-    choice = input("Entrez votre choix (1, 2 ou 3) : ")
+    choice = input("Enter your choice (1, 2 or 3): ")
 
     if choice == "1":
         level = "light"
@@ -183,17 +183,17 @@ def main():
     elif choice == "3":
         level = "aggressive"
     else:
-        print("Choix invalide. Utilisation du niveau standard.")
+        print("Invalid choice. Using standard level.")
         level = "standard"
 
     # Ask for custom parameters once
-    print("\nVoulez-vous ajouter une ligne de paramètres spécifique à comparer ?")
-    print("(Entrez vos paramètres et appuyez sur Entrée. Si rien ne se passe, appuyez sur Entrée une seconde fois.)")
-    print("(Laissez vide et appuyez sur Entrée pour ignorer.)")
+    print("\nWould you like to add custom parameters to compare?")
+    print("(Enter your parameters and press Enter. If nothing happens, press Enter a second time.)")
+    print("(Leave empty and press Enter to skip.)")
 
     custom_params = []
     while True:
-        line = input("Paramètres personnalisés : ").strip()
+        line = input("Custom parameters: ").strip()
         if line:
             custom_params.append(line)
         else:
@@ -207,7 +207,7 @@ def main():
 
     for file_index, input_file in enumerate(input_files, 1):
         print(f"\n{'='*60}")
-        print(f"Traitement du fichier {file_index}/{len(input_files)}: {os.path.basename(input_file)}")
+        print(f"Processing file {file_index}/{len(input_files)}: {os.path.basename(input_file)}")
         print(f"{'='*60}")
 
         # Only ask for confirmation on the first file
@@ -222,25 +222,25 @@ def main():
 
     # Final summary
     print(f"\n{'='*60}")
-    print("RÉSUMÉ DU TRAITEMENT BATCH")
+    print("BATCH PROCESSING SUMMARY")
     print(f"{'='*60}")
-    print(f"\nFichiers traités avec succès ({len(successful_files)}):")
+    print(f"\nFiles processed successfully ({len(successful_files)}):")
     for file in successful_files:
         print(f"  ✓ {os.path.basename(file)}")
 
     if failed_files:
-        print(f"\nFichiers échoués ou annulés ({len(failed_files)}):")
+        print(f"\nFailed or cancelled files ({len(failed_files)}):")
         for file in failed_files:
             print(f"  ✗ {os.path.basename(file)}")
 
-    print(f"\nTraitement terminé!")
-    print(f"Total: {len(successful_files)}/{len(input_files)} fichiers traités avec succès")
+    print(f"\nProcessing complete!")
+    print(f"Total: {len(successful_files)}/{len(input_files)} files processed successfully")
     print(f"\n{'='*60}")
-    print("ÉTAPE SUIVANTE : SCORING DES ALIGNEMENTS")
+    print("NEXT STEP: ALIGNMENT SCORING")
     print(f"{'='*60}")
-    print("Pour identifier le meilleur alignement parmi ceux générés,")
-    print("utilisez MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py,")
-    print("disponible dans ce dépôt :")
+    print("To identify the best alignment among those generated,")
+    print("use AlignmentScorerWithJalview.py,")
+    print("available in this repository:")
     print("https://github.com/NicoFrL/MAFFT_ScoreNGo")
 
 if __name__ == "__main__":

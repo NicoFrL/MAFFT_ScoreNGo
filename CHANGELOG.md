@@ -5,10 +5,10 @@
 ### Changed
 - **`MAFFT_ScoreNGo.py` is now an alignment generator only.** The simple BLOSUM62-based scoring previously embedded in this script has been removed.
 - The script now supports **batch processing** of multiple FASTA files in a single run, creating separate output directories per input.
-- At the end of a run, users are pointed to `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py` for alignment evaluation.
+- At the end of a run, users are pointed to `AlignmentScorerWithJalview.py` for alignment evaluation.
 
 ### Added
-- **`MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py`** — new standalone scoring tool implementing:
+- **`AlignmentScorerWithJalview.py`** — new standalone scoring tool implementing:
   - Exact Jalview conservation algorithm (per-column 0–11 scores, 10 physicochemical property classes, AMAS-derived)
   - Exact Jalview quality algorithm (BLOSUM62-based)
   - Sum-of-Pairs score (BLOSUM62)
@@ -24,6 +24,7 @@
 ### Removed
 - `evaluate_alignment()` and related ranking output from `MAFFT_ScoreNGo.py`.
 - `mafft_results_summary.txt` is no longer produced by `MAFFT_ScoreNGo.py`; equivalent (and more detailed) ranking output is now produced by the scorer.
+- `MAFFT_ScoreNGo_Documentation.pdf` removed (the README and PARAMETERS.md now serve as the canonical documentation).
 
 ### Notes
 - Users who relied on the previous in-script scoring should migrate to the new two-step workflow described in the README.

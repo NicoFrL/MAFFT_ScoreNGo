@@ -1,6 +1,6 @@
 # Parameters Reference
 
-This document describes the MAFFT parameter combinations tested by `MAFFT_ScoreNGo.py` and the scoring metrics computed by `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py`.
+This document describes the MAFFT parameter combinations tested by `MAFFT_ScoreNGo.py` and the scoring metrics computed by `AlignmentScorerWithJalview.py`.
 
 ---
 
@@ -80,7 +80,7 @@ After choosing a screening level, users may supply additional MAFFT parameter st
 
 ---
 
-## Part 2 — Scoring metrics computed by `MAFFT_AlignmentScorer_EXACT_JALVIEW-2.py`
+## Part 2 — Scoring metrics computed by `AlignmentScorerWithJalview.py`
 
 The scorer evaluates every `alignment_*.fasta` file produced by `MAFFT_ScoreNGo.py` and computes the following metrics.
 
