@@ -188,12 +188,6 @@ Example input files are provided in the `examples/` directory. To reproduce the 
 
 ---
 
-## French Version
-
-A French interactive version of the original (single-file, with simple scoring) is available as `MAFFT_ScoreNGo_Fr.py`. It is kept for legacy reasons; new users are encouraged to use the two-step workflow described above.
-
----
-
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
